@@ -13,28 +13,33 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
-    <li class="nav-item @if(request()->routeIs('home')) active @endif">
+    <li class="nav-item @if (request()->routeIs('home')) active @endif">
         <a class="nav-link" href="{{ route('home') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>{{ __('Dashboard') }}</span></a>
     </li>
 
     <!-- Nav Item - Tables -->
-    <li class="nav-item @if(request()->routeIs('users.index')) active @endif">
+    <li class="nav-item @if (request()->routeIs('users.index')) active @endif">
         <a class="nav-link" href="{{ route('users.index') }}">
             <i class="fas fa-fw fa-users"></i>
             <span>{{ __('Users') }}</span></a>
     </li>
 
-    <li class="nav-item @if(request()->routeIs('voice.index')) active @endif">
+    <li class="nav-item @if (request()->routeIs('voice.index')) active @endif">
         <a class="nav-link" href="{{ route('voice.index') }}">
             <i class="fas fa-fw fa-eye"></i>
             <span>{{ __('Voice') }}</span></a>
     </li>
-    <li class="nav-item @if(request()->routeIs('verification.index')) active @endif">
+    <li class="nav-item @if (request()->routeIs('verification.index')) active @endif">
         <a class="nav-link" href="{{ route('verification.index') }}">
             <i class="fas fa-fw fa-eye"></i>
             <span>{{ __('Verification') }}</span></a>
+    </li>
+    <li class="nav-item @if (request()->routeIs('face.index')) active @endif">
+        <a class="nav-link" href="{{ route('face.index') }}">
+            <i class="fas fa-fw fa-eye"></i>
+            <span>{{ __('Face') }}</span></a>
     </li>
 
     <!-- Divider -->
@@ -43,7 +48,7 @@
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-           aria-expanded="true" aria-controls="collapseTwo" style="padding-top: inherit;">
+            aria-expanded="true" aria-controls="collapseTwo" style="padding-top: inherit;">
             <i class="fas fa-fw fa-cog"></i>
             <span>Two-level menu</span>
         </a>
