@@ -13,39 +13,39 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
-    <li class="nav-item @if (request()->routeIs('home')) active @endif">
-        <a class="nav-link" href="{{ route('home') }}">
+    <li class="nav-item <?php if(request()->routeIs('home')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('home')); ?>">
             <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>{{ __('Dashboard') }}</span></a>
+            <span><?php echo e(__('Dashboard')); ?></span></a>
     </li>
 
     <!-- Nav Item - Tables -->
-    <li class="nav-item @if (request()->routeIs('users.index')) active @endif">
-        <a class="nav-link" href="{{ route('users.index') }}">
+    <li class="nav-item <?php if(request()->routeIs('users.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('users.index')); ?>">
             <i class="fas fa-fw fa-users"></i>
-            <span>{{ __('Users') }}</span></a>
+            <span><?php echo e(__('Users')); ?></span></a>
     </li>
 
-    <li class="nav-item @if (request()->routeIs('voice.index')) active @endif">
-        <a class="nav-link" href="{{ route('voice.index') }}">
+    <li class="nav-item <?php if(request()->routeIs('voice.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('voice.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
-            <span>{{ __('Voice') }}</span></a>
+            <span><?php echo e(__('Voice')); ?></span></a>
     </li>
-    <li class="nav-item @if (request()->routeIs('verification.index')) active @endif">
-        <a class="nav-link" href="{{ route('verification.index') }}">
+    <li class="nav-item <?php if(request()->routeIs('verification.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('verification.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
-            <span>{{ __('Verification') }}</span></a>
+            <span><?php echo e(__('Verification')); ?></span></a>
     </li>
-    <li class="nav-item @if (request()->routeIs('face.index')) active @endif">
-        <a class="nav-link" href="{{ route('face.index') }}">
+    <li class="nav-item <?php if(request()->routeIs('face.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('face.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
-            <span>{{ __('Face') }}</span></a>
+            <span><?php echo e(__('Face')); ?></span></a>
     </li>
     </li>
-    <li class="nav-item @if (request()->routeIs('verif.index')) active @endif">
-        <a class="nav-link" href="{{ route('verif.index') }}">
+    <li class="nav-item <?php if(request()->routeIs('verif.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('verif.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
-            <span>{{ __('verif') }}</span></a>
+            <span><?php echo e(__('verif')); ?></span></a>
     </li>
 
     <!-- Divider -->
@@ -72,3 +72,4 @@
 
 </ul>
 <!-- End of Sidebar -->
+<?php /**PATH E:\voiceLaravel\resources\views/layouts/navigation.blade.php ENDPATH**/ ?>

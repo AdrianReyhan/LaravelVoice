@@ -7,17 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Mehrdad Amini">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite('resources/css/app.css')
+    <title><?php echo e(config('app.name', 'Laravel')); ?></title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/app.css'); ?>
     <!-- Custom fonts for this template-->
-    <link href="{{ asset('css/fontawsome-free-all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="<?php echo e(asset('css/fontawsome-free-all.min.css')); ?>" rel="stylesheet" type="text/css">
 
     <!-- Custom styles for this template-->
-    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="<?php echo e(asset('css/sb-admin-2.min.css')); ?>" rel="stylesheet">
 
     <!-- Custom styles for this Page-->
-    @yield('custom_styles')
+    <?php echo $__env->yieldContent('custom_styles'); ?>
 
 </head>
 
@@ -26,7 +26,7 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        @include('layouts.navigation')
+        <?php echo $__env->make('layouts.navigation', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -52,23 +52,25 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span
-                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
-                                <img class="img-profile rounded-circle" src="{{ asset('images/undraw_profile.svg') }}">
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo e(Auth::user()->name); ?></span>
+                                <img class="img-profile rounded-circle" src="<?php echo e(asset('images/undraw_profile.svg')); ?>">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                <a class="dropdown-item" href="<?php echo e(route('profile.show')); ?>">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    {{ __('Profile') }}
+                                    <?php echo e(__('Profile')); ?>
+
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <!-- Logout form with POST method -->
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
+                                <form action="<?php echo e(route('logout')); ?>" method="POST">
+                                    <?php echo csrf_field(); ?>
                                     <button type="submit" class="dropdown-item">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        {{ __('Logout') }}
+                                        <?php echo e(__('Logout')); ?>
+
                                     </button>
                                 </form>
                             </div>
@@ -79,7 +81,7 @@
 
                 </nav>
                 <!-- End of Topbar -->
-                @yield('content')
+                <?php echo $__env->yieldContent('content'); ?>
             </div>
             <!-- End of Main Content -->
 
@@ -87,7 +89,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        {{-- <span>Copyright &copy; Your Website 2021</span> --}}
+                        
                     </div>
                 </div>
             </footer>
@@ -117,13 +119,14 @@
                 </div>
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('logout')); ?>">
+                        <?php echo csrf_field(); ?>
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <a href="{{ route('logout') }}" class="btn btn-primary"
+                        <a href="<?php echo e(route('logout')); ?>" class="btn btn-primary"
                             onclick="event.preventDefault(); this.closest('form').submit();">
                             <i class="mr-2 fas fa-sign-out-alt"></i>
-                            {{ __('Log Out') }}
+                            <?php echo e(__('Log Out')); ?>
+
                         </a>
                     </form>
 
@@ -131,18 +134,19 @@
             </div>
         </div>
     </div>
-    @vite('resources/js/app.js')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
 
     <!-- Core plugin JavaScript-->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.easing-1.4.1.min.js') }}"></script>
+    <script src="<?php echo e(asset('js/jquery.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/jquery.easing-1.4.1.min.js')); ?>"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script src="<?php echo e(asset('js/sb-admin-2.min.js')); ?>"></script>
 
     <!-- Page level custom scripts -->
-    @yield('custom_scripts')
+    <?php echo $__env->yieldContent('custom_scripts'); ?>
 
 </body>
 
 </html>
+<?php /**PATH E:\voiceLaravel\resources\views/layouts/app.blade.php ENDPATH**/ ?>

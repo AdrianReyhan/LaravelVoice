@@ -24,7 +24,11 @@ class FaceRecognitionController extends Controller
             return response()->json(["status" => "error", "message" => "Tidak ada gambar ditemukan"], 404);
         }
 
-        // Kirimkan gambar-gambar yang ditemukan dalam format JSON
-        return response()->json($images);
+        // Kembalikan data gambar dalam format JSON
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Gambar ditemukan',
+            'data' => $images,
+        ]);
     }
 }
