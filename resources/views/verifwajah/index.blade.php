@@ -1,10 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Main content -->
     <div class="content">
         <div class="container-fluid">
-            <!-- Page Heading -->
             <h1 class="h3 mb-2 text-gray-800">{{ __('Verifikasi Wajah') }}</h1>
 
             <div class="row">
@@ -12,41 +10,88 @@
                     <div class="card">
                         <div class="card-body">
                             <p class="card-text">
-                                {{ __('Silakan unggah gambar untuk verifikasi wajah.') }}
+                                {{ __('Arahkan wajah ke kamera untuk verifikasi.') }}
                             </p>
 
-                            <!-- Form untuk mengunggah gambar -->
-                            <h3>Upload Gambar untuk Pengenalan Wajah</h3>
-                            <form action="{{ url('/verify-face') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="form-group">
-                                    <input type="file" name="image" accept="image/*" required>
-                                    <button type="submit" class="btn btn-primary">Verify Face</button>
-                                </div>
-                            </form>
+                            <!-- Menampilkan Live Video -->
+                            <div class="video-container text-center">
+                                <video id="video" autoplay></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                                <br>
+                                <button class="btn btn-primary mt-3" onclick="captureImage()">Verify Face</button>
+                            </div>
 
                             <!-- Menampilkan hasil verifikasi -->
-                            @if (session('status'))
-                                <div class="alert alert-{{ session('status') == 'success' ? 'success' : 'danger' }}">
-                                    <p>{{ session('message') ?? (session('status') == 'success' ? 'Verifikasi berhasil!' : 'Verifikasi gagal!') }}</p>
-                                    @if (session('identity'))
-                                        <p><strong>Identitas:</strong> {{ session('identity') }}</p>
-                                    @endif
-                                </div>
-                            @endif
-
-                            <!-- Menampilkan gambar yang diupload -->
-                            @if (session('image_path'))
-                                <h3>Gambar yang Diupload:</h3>
-                                <img src="{{ asset('storage/' . session('image_path')) }}" alt="Uploaded Image" class="img-fluid">
-                            @endif
+                            <div id="result" class="mt-3"></div>
 
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
+        </div>
     </div>
-    <!-- /.content -->
+
+    <script>
+        // Mengakses kamera pengguna
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing camera: ", err);
+            });
+
+        function captureImage() {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            // Set ukuran canvas sesuai dengan video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Gambar frame dari video ke canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Konversi gambar ke base64
+            const imageData = canvas.toDataURL('image/png');
+
+            // Kirim data ke Laravel dengan AJAX
+            fetch("{{ url('/verify-face') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById("result");
+                if (data.status === "success") {
+                    resultDiv.innerHTML = `<div class="alert alert-success">
+                        <strong>Identitas:</strong> ${data.identity}
+                    </div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+
+    <style>
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        video {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 10px;
+            border: 2px solid #007bff;
+        }
+    </style>
 @endsection

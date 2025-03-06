@@ -70,29 +70,34 @@ class VerifFaceController extends Controller
 
     public function verifyFace(Request $request)
     {
-        // Pastikan ada file gambar dalam request
-        if (!$request->hasFile('image')) {
-            return redirect()->back()->with([
+        // Pastikan ada gambar dalam request (base64)
+        $imageData = $request->input('image');
+
+        if (!$imageData) {
+            return response()->json([
                 'status' => 'error',
                 'message' => 'No image provided'
             ]);
         }
 
-        // Ambil file gambar
-        $image = $request->file('image');
+        // Menghapus prefix base64
+        $imageData = str_replace('data:image/png;base64,', '', $imageData);
+        $imageData = str_replace(' ', '+', $imageData);
+        $imageBinary = base64_decode($imageData);
 
-        // Simpan gambar ke storage Laravel (public/uploads)
-        $imagePath = $image->store('uploads', 'public');
+        // Simpan sementara gambar di storage Laravel
+        $fileName = 'uploads/' . uniqid() . '.png';
+        Storage::disk('public')->put($fileName, $imageBinary);
 
-        // Mengirim gambar ke API Flask
+        // Kirim gambar ke API Flask
         try {
             $client = new Client();
             $response = $client->post('http://127.0.0.1:5000/recognize_face', [
                 'multipart' => [
                     [
                         'name' => 'image',
-                        'contents' => fopen($image->getRealPath(), 'r'),
-                        'filename' => $image->getClientOriginalName(),
+                        'contents' => fopen(storage_path('app/public/' . $fileName), 'r'),
+                        'filename' => basename($fileName),
                     ],
                 ]
             ]);
@@ -101,20 +106,21 @@ class VerifFaceController extends Controller
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['identity'])) {
-                session()->flash('status', 'success');
-                session()->flash('identity', $data['identity']);
-                session()->flash('image_path', $imagePath);
+                return response()->json([
+                    'status' => 'success',
+                    'identity' => $data['identity']
+                ]);
             } else {
-                session()->flash('status', 'error');
-                session()->flash('message', 'No face detected');
-                session()->flash('image_path', $imagePath);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No face detected'
+                ]);
             }
         } catch (\Exception $e) {
-            session()->flash('status', 'error');
-            session()->flash('message', 'No face detected');
-            session()->flash('image_path', $imagePath);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error connecting to Face Recognition API.'
+            ]);
         }
-
-        return redirect()->back();
     }
 }
