@@ -71,11 +71,21 @@ class VerifFaceController extends Controller
     public function verifyFace(Request $request)
     {
         // Pastikan ada file gambar dalam request
-        if ($request->hasFile('image')) {
-            // Ambil file gambar
-            $image = $request->file('image');
-            
-            // Mengirim gambar ke API Flask
+        if (!$request->hasFile('image')) {
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'No image provided'
+            ]);
+        }
+
+        // Ambil file gambar
+        $image = $request->file('image');
+
+        // Simpan gambar ke storage Laravel (public/uploads)
+        $imagePath = $image->store('uploads', 'public');
+
+        // Mengirim gambar ke API Flask
+        try {
             $client = new Client();
             $response = $client->post('http://127.0.0.1:5000/recognize_face', [
                 'multipart' => [
@@ -90,14 +100,21 @@ class VerifFaceController extends Controller
             // Mendapatkan hasil dari Flask
             $data = json_decode($response->getBody(), true);
 
-            // Cek hasil identifikasi
             if (isset($data['identity'])) {
-                return response()->json(['status' => 'success', 'identity' => $data['identity']]);
+                session()->flash('status', 'success');
+                session()->flash('identity', $data['identity']);
+                session()->flash('image_path', $imagePath);
             } else {
-                return response()->json(['status' => 'error', 'message' => 'No face detected']);
+                session()->flash('status', 'error');
+                session()->flash('message', 'No face detected');
+                session()->flash('image_path', $imagePath);
             }
+        } catch (\Exception $e) {
+            session()->flash('status', 'error');
+            session()->flash('message', 'No face detected');
+            session()->flash('image_path', $imagePath);
         }
 
-        return response()->json(['status' => 'error', 'message' => 'No image provided']);
+        return redirect()->back();
     }
 }
