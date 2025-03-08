@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
@@ -24,18 +22,19 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($users as $user)
+                        <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->created_at }}</td>
-                                <td>{{ $user->updated_at->diffForhumans() }}</td>
+                                <td><?php echo e($user->name); ?></td>
+                                <td><?php echo e($user->email); ?></td>
+                                <td><?php echo e($user->created_at); ?></td>
+                                <td><?php echo e($user->updated_at->diffForhumans()); ?></td>
                             </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
 
-                    {{ $users->links() }}
+                    <?php echo e($users->links()); ?>
+
 
                 </div>
             </div>
@@ -43,4 +42,6 @@
 
     </div>
     <!-- /.container-fluid -->
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\voiceLaravel\resources\views/users/index.blade.php ENDPATH**/ ?>

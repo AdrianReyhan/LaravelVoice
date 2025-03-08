@@ -19,16 +19,22 @@
 
             <!-- Tampilkan video live -->
             <div class="form-group">
-                <video id="videoElement" width="640" height="480" autoplay></video>
-                <button id="captureBtn" class="btn btn-success mt-3">Capture Face</button>
-            </div>
+                <div class="video-container text-center">
+                    <video id="videoElement" width="640" height="480" autoplay></video>
+                    <button id="captureBtn" class="btn btn-success mt-3">Capture Face</button>
+                </div>
 
-            <!-- Hidden form to send captured image to backend -->
-            <form id="captureForm" action="<?php echo e(route('registerFace')); ?>" method="POST" enctype="multipart/form-data" style="display: none;">
-                <?php echo csrf_field(); ?>
-                <input type="hidden" name="image" id="capturedImage">
-                <button type="submit" id="submitBtn" class="btn btn-success mt-3">Submit Face</button>
-            </form>
+                <!-- Hidden form to send captured image to backend -->
+                <div class="video-container text-center">
+
+                    <form id="captureForm" action="<?php echo e(route('registerFace')); ?>" method="POST" enctype="multipart/form-data"
+                    style="display: none;">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="image" id="capturedImage">
+                    <button type="submit" id="submitBtn" class="btn btn-success mt-3">Submit Face</button>
+                </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -44,7 +50,9 @@
         let capturedImage = null;
 
         // Akses kamera pengguna
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
             .then((stream) => {
                 video.srcObject = stream;
             })
@@ -71,6 +79,13 @@
             captureBtn.style.display = 'none';
         });
     </script>
+    <style>
+         .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\voiceLaravel\resources\views/faceEnrolment/index.blade.php ENDPATH**/ ?>

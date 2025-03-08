@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <h1 class="h3 mb-2 text-gray-800">Take Photos for Face Recognition</h1>
 
-            @if(session('success'))
+            @if (session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
                 </div>
@@ -17,16 +17,22 @@
 
             <!-- Tampilkan video live -->
             <div class="form-group">
-                <video id="videoElement" width="640" height="480" autoplay></video>
-                <button id="captureBtn" class="btn btn-success mt-3">Capture Face</button>
-            </div>
+                <div class="video-container text-center">
+                    <video id="videoElement" width="640" height="480" autoplay></video>
+                    <button id="captureBtn" class="btn btn-success mt-3">Capture Face</button>
+                </div>
 
-            <!-- Hidden form to send captured image to backend -->
-            <form id="captureForm" action="{{ route('registerFace') }}" method="POST" enctype="multipart/form-data" style="display: none;">
-                @csrf
-                <input type="hidden" name="image" id="capturedImage">
-                <button type="submit" id="submitBtn" class="btn btn-success mt-3">Submit Face</button>
-            </form>
+                <!-- Hidden form to send captured image to backend -->
+                <div class="video-container text-center">
+
+                    <form id="captureForm" action="{{ route('registerFace') }}" method="POST" enctype="multipart/form-data"
+                    style="display: none;">
+                    @csrf
+                    <input type="hidden" name="image" id="capturedImage">
+                    <button type="submit" id="submitBtn" class="btn btn-success mt-3">Submit Face</button>
+                </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -42,7 +48,9 @@
         let capturedImage = null;
 
         // Akses kamera pengguna
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
             .then((stream) => {
                 video.srcObject = stream;
             })
@@ -69,4 +77,11 @@
             captureBtn.style.display = 'none';
         });
     </script>
+    <style>
+         .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
 @endsection
