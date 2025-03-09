@@ -21,6 +21,8 @@
             <div class="form-group">
                 <div class="video-container text-center">
                     <video id="videoElement" width="640" height="480" autoplay></video>
+                </div>
+                <div class="text-center">
                     <button id="captureBtn" class="btn btn-success mt-3">Capture Face</button>
                 </div>
 
@@ -84,6 +86,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transform: scaleX(-1);
         }
     </style>
 <?php $__env->stopSection(); ?>

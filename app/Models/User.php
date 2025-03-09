@@ -45,4 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function faceEnrollment()
+    {
+        return $this->hasOne(FaceEnrollment::class);
+    }
 }

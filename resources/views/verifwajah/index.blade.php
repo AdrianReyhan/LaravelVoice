@@ -92,6 +92,7 @@
             max-width: 500px;
             border-radius: 10px;
             border: 2px solid #007bff;
+            transform: scaleX(-1);
         }
     </style>
 @endsection
