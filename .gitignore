@@ -34,7 +34,7 @@ env/
 __pycache__/
 *.pyo
 *.pyd
-*.so
+*.so 
 *.egg-info/
 *.egg
 dist/
