@@ -28,12 +28,12 @@
 
     <li class="nav-item @if (request()->routeIs('voiceEnroll.index')) active @endif">
         <a class="nav-link" href="{{ route('voiceEnroll.index') }}">
-            <i class="fas fa-fw fa-eye"></i>
+            <i class="fas fa-volume-up"></i> 
             <span>{{ __('Voice Enroll') }}</span></a>
     </li>
     <li class="nav-item @if (request()->routeIs('verification.index')) active @endif">
         <a class="nav-link" href="{{ route('verification.index') }}">
-            <i class="fas fa-fw fa-eye"></i>
+            <i class="fas fa-volume-up"></i>
             <span>{{ __('Verification') }}</span></a>
     </li>
     <li class="nav-item @if (request()->routeIs('faceEnrol.index')) active @endif">

@@ -28,12 +28,12 @@
 
     <li class="nav-item <?php if(request()->routeIs('voiceEnroll.index')): ?> active <?php endif; ?>">
         <a class="nav-link" href="<?php echo e(route('voiceEnroll.index')); ?>">
-            <i class="fas fa-fw fa-eye"></i>
+            <i class="fas fa-volume-up"></i> 
             <span><?php echo e(__('Voice Enroll')); ?></span></a>
     </li>
     <li class="nav-item <?php if(request()->routeIs('verification.index')): ?> active <?php endif; ?>">
         <a class="nav-link" href="<?php echo e(route('verification.index')); ?>">
-            <i class="fas fa-fw fa-eye"></i>
+            <i class="fas fa-volume-up"></i>
             <span><?php echo e(__('Verification')); ?></span></a>
     </li>
     <li class="nav-item <?php if(request()->routeIs('faceEnrol.index')): ?> active <?php endif; ?>">
