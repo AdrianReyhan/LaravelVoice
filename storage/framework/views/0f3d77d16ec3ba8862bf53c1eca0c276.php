@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
     <div class="container">
         <h1 class="h3 mb-4 text-gray-800"><?php echo e(__('Pendaftaran Suara')); ?></h1>
@@ -18,21 +16,26 @@
             </div>
         <?php endif; ?>
 
-
         <div class="card shadow-sm">
             <div class="card-body">
                 <p class="mb-3">Tekan tombol "Mulai Rekam" untuk merekam suara Anda.</p>
-                <p class="mb-3">contoh : Saya merekam suara ini untuk mendaftar ke sistem pengenalan suara.</p>
+                <p class="mb-3">Contoh: Saya merekam suara ini untuk mendaftar ke sistem pengenalan suara.</p>
 
                 <div class="mb-3">
-                    <button id="recordButton" class="btn btn-primary me-2"> Mulai Rekam</button>
+                    <button id="recordButton" class="btn btn-primary me-2">Mulai Rekam</button>
                     <button id="stopButton" class="btn btn-warning me-2" disabled>Stop</button>
-                    <button id="uploadButton" class="btn btn-success" disabled> Upload Suara</button>
+                    <button id="uploadButton" class="btn btn-success" disabled>Upload Suara</button>
                 </div>
 
                 <p id="status" class="text-muted">Menunggu tindakan pengguna...</p>
                 <audio id="audioPlayback" controls class="my-3 w-100" style="display:none;"></audio>
                 <div id="message" class="mt-3 text-success fw-semibold"></div>
+
+                <!-- Form upload tersembunyi -->
+                <form id="voiceForm" action="<?php echo e(route('registerVoice')); ?>" method="POST" enctype="multipart/form-data" style="display: none;">
+                    <?php echo csrf_field(); ?>
+                    <input type="file" name="voice" id="voiceInput" accept="audio/wav">
+                </form>
             </div>
         </div>
     </div>
@@ -51,12 +54,8 @@
 
         recordButton.addEventListener("click", async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: true
-                });
-                mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'audio/webm'
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
                 audioChunks = [];
                 status.innerText = "Merekam suara...";
@@ -66,9 +65,7 @@
                 mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
 
                 mediaRecorder.onstop = async () => {
-                    const webmBlob = new Blob(audioChunks, {
-                        type: 'audio/webm'
-                    });
+                    const webmBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     audioBlob = await convertWebMToWav(webmBlob);
 
                     const audioUrl = URL.createObjectURL(audioBlob);
@@ -103,27 +100,12 @@
                 return;
             }
 
-            const formData = new FormData();
-            formData.append("voice", audioBlob, "recorded_audio.wav");
+            const file = new File([audioBlob], "recorded_audio.wav", { type: "audio/wav" });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById("voiceInput").files = dataTransfer.files;
 
-            fetch("<?php echo e(route('registerVoice')); ?>", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-        "Accept": "application/json"
-    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    message.innerText = data.message || "Suara berhasil diunggah!";
-                    status.innerText = "";
-                    uploadButton.disabled = true;
-                })
-                .catch(err => {
-                    console.error("Upload error:", err);
-                    status.innerText = "Gagal mengunggah suara.";
-                });
+            document.getElementById("voiceForm").submit();
         });
 
         async function convertWebMToWav(webmBlob) {
@@ -185,9 +167,7 @@
                 }
             }
 
-            return new Blob([view], {
-                type: 'audio/wav'
-            });
+            return new Blob([view], { type: 'audio/wav' });
         }
     </script>
 <?php $__env->stopSection(); ?>

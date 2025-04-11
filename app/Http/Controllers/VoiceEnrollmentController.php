@@ -33,7 +33,7 @@ class VoiceEnrollmentController extends Controller
 
             if (!$stored) {
                 Log::error("Gagal menyimpan file suara ke storage.");
-                return response()->json(['status' => 'error', 'message' => 'Gagal menyimpan suara.']);
+                return redirect()->route('voiceEnroll.index')->with('error', 'Gagal menyimpan suara.');
             }
 
             Log::info("Voice successfully saved: " . $fileName);
@@ -76,20 +76,14 @@ class VoiceEnrollmentController extends Controller
                     ]);
                 }
 
-                return $request->expectsJson()
-                    ? response()->json(['status' => 'success', 'message' => 'Suara berhasil didaftarkan.'])
-                    : redirect()->route('voiceEnroll.index')->with('success', 'Suara berhasil didaftarkan!');
+                return redirect()->route('voiceEnroll.index')->with('success', 'Suara berhasil didaftarkan!');
             }
 
-            return $request->expectsJson()
-                ? response()->json(['status' => 'error', 'message' => 'Pendaftaran suara gagal.'])
-                : redirect()->route('voiceEnroll.index')->with('error', 'Pendaftaran suara gagal.');
+            return redirect()->route('voiceEnroll.index')->with('error', 'Pendaftaran suara gagal dari API.');
         } catch (\Exception $e) {
             Log::error("Voice enrollment error: " . $e->getMessage());
 
-            return $request->expectsJson()
-                ? response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan server.'])
-                : redirect()->route('voiceEnroll.index')->with('error', 'Terjadi kesalahan saat mendaftar suara.');
+            return redirect()->route('voiceEnroll.index')->with('error', 'Terjadi kesalahan saat mendaftar suara.');
         }
     }
 }
