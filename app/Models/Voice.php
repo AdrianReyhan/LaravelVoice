@@ -9,6 +9,8 @@ class Voice extends Model
 {
     use HasFactory;
 
+    protected $table = 'voices';
+
     protected $fillable = ['user_id', 'voice_path'];
 
     // Relasi ke user

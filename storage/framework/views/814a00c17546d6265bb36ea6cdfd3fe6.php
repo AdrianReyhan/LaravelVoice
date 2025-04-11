@@ -26,10 +26,10 @@
             <span><?php echo e(__('Users')); ?></span></a>
     </li>
 
-    <li class="nav-item <?php if(request()->routeIs('voice.index')): ?> active <?php endif; ?>">
-        <a class="nav-link" href="<?php echo e(route('voice.index')); ?>">
+    <li class="nav-item <?php if(request()->routeIs('voiceEnroll.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('voiceEnroll.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
-            <span><?php echo e(__('Voice')); ?></span></a>
+            <span><?php echo e(__('Voice Enroll')); ?></span></a>
     </li>
     <li class="nav-item <?php if(request()->routeIs('verification.index')): ?> active <?php endif; ?>">
         <a class="nav-link" href="<?php echo e(route('verification.index')); ?>">

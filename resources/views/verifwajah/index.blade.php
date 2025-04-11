@@ -6,13 +6,17 @@
             <h1 class="h3 mb-4 text-gray-800">{{ __('Verifikasi Wajah & Suara') }}</h1>
 
             <div class="steps mb-4 d-flex justify-content-between">
-                <div class="step text-center active" id="step-face">
+                <div class="step text-center inactive" id="step-face">
                     <div class="step-circle">1</div>
                     <small>Verifikasi Wajah</small>
                 </div>
-                <div class="step text-center" id="step-voice">
+                <div class="step text-center inactive" id="step-voice">
                     <div class="step-circle">2</div>
                     <small>Verifikasi Suara</small>
+                </div>
+                <div class="step text-center inactive" id="step-voice">
+                    <div class="step-circle">3</div>
+                    <small>Absen</small>
                 </div>
             </div>
 
@@ -103,9 +107,18 @@
         }
 
         function moveToVoiceStep() {
+            const stepFace = document.getElementById('step-face');
+            stepFace.classList.remove('inactive');
+            stepFace.classList.add('active');
+
+            const stepVoice = document.getElementById('step-voice');
+            stepVoice.classList.remove('active');
+            stepVoice.classList.add('inactive');
+
+            // Tampilkan form suara
             document.getElementById('voiceCard').style.display = 'block';
-            document.getElementById('step-voice').classList.add('active');
         }
+
 
         // ---------------- Mikrofon (Voice) ---------------- //
         const recordBtn = document.getElementById('recordBtn');
@@ -171,6 +184,10 @@
                                 <p><strong>Prediction:</strong> ${data.prediction}</p>
                             </div>
                         `;
+
+                        const stepVoice = document.getElementById('step-voice');
+                        stepVoice.classList.remove('inactive');
+                        stepVoice.classList.add('active');
                     } else {
                         voiceResultDiv.innerHTML = `<div class="alert alert-danger">Verifikasi suara gagal.</div>`;
                     }
@@ -204,17 +221,18 @@
             position: relative;
             margin-bottom: 30px;
         }
-/* 
-        .steps::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            height: 3px;
-            background: #dee2e6;
-            z-index: 0;
-        } */
+
+        /*
+                                                    .steps::before {
+                                                        content: '';
+                                                        position: absolute;
+                                                        top: 15px;
+                                                        left: 15px;
+                                                        right: 15px;
+                                                        height: 3px;
+                                                        background: #dee2e6;
+                                                        z-index: 0;
+                                                    } */
 
         .step {
             position: relative;
@@ -223,15 +241,21 @@
             flex: 1;
         }
 
+
         .step::after {
             content: '';
             position: absolute;
             top: 15px;
+            left: 50%;
             right: -50%;
-            width: 100%;
             height: 3px;
             background: #dee2e6;
-            z-index: 0;
+            z-index: -1;
+            transition: background-color 0.3s ease;
+        }
+
+        .step.active::after {
+            background-color: #007bff;
         }
 
         .step:last-child::after {
@@ -243,17 +267,30 @@
             height: 30px;
             line-height: 30px;
             border-radius: 50%;
-            background: #dee2e6;
             color: #fff;
             margin: 0 auto 5px;
             text-align: center;
             z-index: 1;
             position: relative;
-
+            background: #dee2e6;
+            /* default gray for inactive */
         }
 
         .step.active .step-circle {
             background: #007bff;
+        }
+
+        .step.inactive .step-circle {
+            background: #dee2e6;
+        }
+
+
+        .step.active small {
+            color: #007bff;
+        }
+
+        .step.inactive small {
+            color: #6c757d;
         }
 
         .step small {

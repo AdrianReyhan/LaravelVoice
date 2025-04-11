@@ -26,10 +26,10 @@
             <span>{{ __('Users') }}</span></a>
     </li>
 
-    <li class="nav-item @if (request()->routeIs('voice.index')) active @endif">
-        <a class="nav-link" href="{{ route('voice.index') }}">
+    <li class="nav-item @if (request()->routeIs('voiceEnroll.index')) active @endif">
+        <a class="nav-link" href="{{ route('voiceEnroll.index') }}">
             <i class="fas fa-fw fa-eye"></i>
-            <span>{{ __('Voice') }}</span></a>
+            <span>{{ __('Voice Enroll') }}</span></a>
     </li>
     <li class="nav-item @if (request()->routeIs('verification.index')) active @endif">
         <a class="nav-link" href="{{ route('verification.index') }}">
