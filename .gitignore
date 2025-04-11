@@ -1,3 +1,4 @@
+# Laravel
 /.phpunit.cache
 /node_modules
 /public/build
@@ -16,12 +17,34 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+
+# Editor & IDEs
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+
+# Python
 venv/
+ENV/
+env/
+.venv/
 *.pyc
 __pycache__/
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.ipynb_checkpoints
+*.log
+*.spec
 
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Mac
+.DS_Store
