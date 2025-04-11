@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\FaceController;
 use App\Http\Controllers\FaceEnrollmentController;
+use App\Http\Controllers\VerifController;
 use App\Http\Controllers\VerifFaceController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\VerifVoiceController;
 use App\Http\Controllers\VoiceController;
 use App\Http\Controllers\VoiceEnrollmentController;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +35,15 @@ Route::middleware('auth')->group(function () {
     #suara
     Route::get('/voice-enrol', [VoiceEnrollmentController::class, 'index'])->name('voiceEnroll.index');
     Route::post('/voice-enrol', [VoiceEnrollmentController::class, 'registerVoice'])->name('registerVoice');
+    Route::get('/verifsuara', [VerifVoiceController::class , 'index'])->name('verif.index');
+    Route::post('/verify-voice', [VoiceEnrollmentController::class, 'registerVoice'])->name('registerVoice');
+
+
+    Route::get('/verifikasi', [VerifController::class, 'index'])->name('verifikasi.index');
+    Route::post('/verifikasi/wajah', [VerifController::class, 'verifyFace'])->name('verifikasi.face');
+    Route::post('/verifikasi/suara', [VerifController::class, 'verifyVoice'])->name('verifikasi.voice');
+    // Route::post('/submit-absen', [PresensiController::class, 'submitAbsen']);
+
 
     Route::post('/upload-image', [FaceController::class, 'uploadImage'])->name('uploadImage');
     Route::get('verification', [VerificationController::class, 'index'])->name('verification.index');

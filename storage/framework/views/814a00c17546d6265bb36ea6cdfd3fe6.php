@@ -42,8 +42,9 @@
             <span><?php echo e(__('Face Enroll')); ?></span></a>
     </li>
     </li>
-    <li class="nav-item <?php if(request()->routeIs('verif.index')): ?> active <?php endif; ?>">
-        <a class="nav-link" href="<?php echo e(route('verif.index')); ?>">
+    
+     <li class="nav-item <?php if(request()->routeIs('verifikasi.index')): ?> active <?php endif; ?>">
+        <a class="nav-link" href="<?php echo e(route('verifikasi.index')); ?>">
             <i class="fas fa-fw fa-eye"></i>
             <span><?php echo e(__('verif')); ?></span></a>
     </li>

@@ -42,8 +42,13 @@
             <span>{{ __('Face Enroll') }}</span></a>
     </li>
     </li>
-    <li class="nav-item @if (request()->routeIs('verif.index')) active @endif">
+    {{-- <li class="nav-item @if (request()->routeIs('verif.index')) active @endif">
         <a class="nav-link" href="{{ route('verif.index') }}">
+            <i class="fas fa-fw fa-eye"></i>
+            <span>{{ __('verif') }}</span></a>
+    </li> --}}
+     <li class="nav-item @if (request()->routeIs('verifikasi.index')) active @endif">
+        <a class="nav-link" href="{{ route('verifikasi.index') }}">
             <i class="fas fa-fw fa-eye"></i>
             <span>{{ __('verif') }}</span></a>
     </li>
