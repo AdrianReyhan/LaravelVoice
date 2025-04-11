@@ -27,7 +27,7 @@
                 </div>
 
                 <!-- Hidden form to send captured image to backend -->
-                <div class="video-container text-center">
+                <div class="text-center">
 
                     <form id="captureForm" action="<?php echo e(route('registerFace')); ?>" method="POST" enctype="multipart/form-data"
                     style="display: none;">
