@@ -19,7 +19,6 @@ class VoiceEnrollmentController extends Controller
     public function registerVoice(Request $request)
     {
         try {
-            // Validasi input suara
             $request->validate([
                 'voice' => 'required|mimes:wav,mp3,webm|max:10240', // max 10MB
             ]);
@@ -28,7 +27,7 @@ class VoiceEnrollmentController extends Controller
             $file = $request->file('voice');
             $extension = $file->getClientOriginalExtension();
 
-            // Buat path dan simpan file ke storage/app/public/voices
+            // Buat nama file dan simpan ke storage/public/voices
             $fileName = 'voices/voice_' . uniqid() . '.' . $extension;
             $stored = Storage::disk('public')->put($fileName, file_get_contents($file));
 
@@ -38,11 +37,9 @@ class VoiceEnrollmentController extends Controller
             }
 
             Log::info("Voice successfully saved: " . $fileName);
-
-            // Ambil path absolut untuk dikirim ke Flask
             $filePath = storage_path('app/public/' . $fileName);
 
-            // Kirim file suara ke Flask API
+            // Kirim file ke Flask API
             $client = new Client();
             $response = $client->post('http://127.0.0.1:5000/enrol_voice', [
                 'multipart' => [
@@ -61,10 +58,23 @@ class VoiceEnrollmentController extends Controller
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['status']) && $data['status'] === 'success') {
-                Voice::create([
-                    'user_id' => $userId,
-                    'voice_path' => $fileName,
-                ]);
+                $existing = Voice::where('user_id', $userId)->first();
+
+                if ($existing) {
+                    // Hapus file lama dari storage
+                    if (Storage::disk('public')->exists($existing->voice_path)) {
+                        Storage::disk('public')->delete($existing->voice_path);
+                    }
+
+                    // Update voice_path baru
+                    $existing->update(['voice_path' => $fileName]);
+                } else {
+                    // Insert baru
+                    Voice::create([
+                        'user_id' => $userId,
+                        'voice_path' => $fileName,
+                    ]);
+                }
 
                 return $request->expectsJson()
                     ? response()->json(['status' => 'success', 'message' => 'Suara berhasil didaftarkan.'])

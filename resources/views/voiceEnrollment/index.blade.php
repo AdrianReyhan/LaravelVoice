@@ -108,9 +108,9 @@
                     method: "POST",
                     body: formData,
                     headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            "content"),
-                    }
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        "Accept": "application/json"
+    }
                 })
                 .then(res => res.json())
                 .then(data => {
