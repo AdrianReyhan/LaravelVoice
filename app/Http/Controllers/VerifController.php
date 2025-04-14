@@ -60,13 +60,15 @@ class VerifController extends Controller
 
             $data = json_decode($response->getBody(), true);
 
+            // Assuming Flask API returns the similarity score as 'similarity'
             if (isset($data['identity']) && $data['identity'] == $user_id) {
                 $user = User::find($user_id);
 
                 return response()->json([
                     'status' => 'success',
                     'identity' => $user ? $user->name : 'Unknown',
-                    'message' => 'Face recognized successfully!'
+                    'similarity' => isset($data['similarity']) ? $data['similarity'] : 0, // Add similarity score here
+                    'message' => 'Wajah berhasil dikenali!'
                 ]);
             } else {
                 return response()->json([
@@ -77,10 +79,11 @@ class VerifController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No face detected or error from API.'
+                'message' => 'Tidak ada wajah yang terdeteksi atau kesalahan dari API.'
             ]);
         }
     }
+
 
     /**
      * Verifikasi suara dari input file audio

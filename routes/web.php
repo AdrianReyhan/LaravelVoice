@@ -40,8 +40,8 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('/verifikasi', [VerifController::class, 'index'])->name('verifikasi.index');
-    Route::post('/verifikasi/wajah', [VerifController::class, 'verifyFace'])->name('verifikasi.face');
-    Route::post('/verifikasi/suara', [VerifController::class, 'verifyVoice'])->name('verifikasi.voice');
+    Route::post('/verifikasi-wajah', [VerifController::class, 'verifyFace'])->name('verifikasi.face');
+    Route::post('/verifikasi-suara', [VerifController::class, 'verifyVoice'])->name('verifikasi.voice');
     // Route::post('/submit-absen', [PresensiController::class, 'submitAbsen']);
 
 

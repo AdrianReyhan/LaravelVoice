@@ -72,7 +72,9 @@
 
         // Kamera
         const video = document.getElementById('video');
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
             .then(stream => {
                 video.srcObject = stream;
             })
@@ -86,34 +88,53 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = canvas.toDataURL('image/png');
 
-            fetch("{{ url('/verify-face') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ image: imageData })
-            })
-            .then(response => response.json())
-            .then(data => {
-                let faceResultDiv = document.getElementById("faceResult");
-                if (data.status === "success") {
+            // Munculkan card hasil sebelum mulai proses
+            const resultCard = document.getElementById('resultCard');
+            const faceResultDiv = document.getElementById("faceResult");
+            resultCard.style.display = 'block';
+            faceResultDiv.innerHTML = "";
+
+            fetch("{{ url('/verifikasi-wajah') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        image: imageData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        faceResultDiv.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                    <strong>Berhasil!</strong> Wajah dikenali sebagai <strong>${data.identity}</strong> <br>
+                    <strong>Similarity:</strong> <strong>${data.similarity}%</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                        document.getElementById('step-face').classList.replace('inactive', 'active');
+                        document.getElementById('voiceCard').style.display = 'block';
+                        faceVerified = true;
+                    } else {
+                        faceResultDiv.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                    <strong>Gagal!</strong> ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                        faceVerified = false;
+                    }
+                })
+                .catch(error => {
                     faceResultDiv.innerHTML = `
-                        <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
-                            <strong>Berhasil!</strong> Wajah dikenali sebagai <strong>${data.identity}</strong>.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>`;
-                    document.getElementById('step-face').classList.replace('inactive', 'active');
-                    document.getElementById('voiceCard').style.display = 'block';
-                    document.getElementById('resultCard').style.display = 'block';
-                    faceVerified = true;
-                } else {
-                    faceVerified = false;
-                    faceResultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                }
-            })
-            .catch(error => console.error("Face Error:", error));
+            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                <strong>Error!</strong> Terjadi kesalahan saat mengirim data.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+                    console.error("Face Error:", error);
+                });
         }
+
 
         // Suara
         const recordBtn = document.getElementById('recordBtn');
@@ -123,12 +144,16 @@
         let audioChunks = [];
 
         recordBtn.addEventListener('click', () => {
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            navigator.mediaDevices.getUserMedia({
+                    audio: true
+                })
                 .then(stream => {
                     mediaRecorder = new MediaRecorder(stream);
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                     mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioBlob = new Blob(audioChunks, {
+                            type: 'audio/wav'
+                        });
                         sendToBackend(audioBlob);
                         audioChunks = [];
                     };
@@ -155,35 +180,36 @@
             formData.append('voice', blob, 'recorded_audio.wav');
 
             fetch('{{ route('verify.voice') }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const voiceResultDiv = document.getElementById("voiceResult");
-                if (data.score && data.prediction) {
-                    voiceResultDiv.innerHTML = `
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const voiceResultDiv = document.getElementById("voiceResult");
+                    if (data.score && data.prediction) {
+                        voiceResultDiv.innerHTML = `
                         <div class="alert alert-success">
                             <p><strong>Score:</strong> ${data.score}</p>
                             <p><strong>Prediction:</strong> ${data.prediction}</p>
                         </div>`;
-                    document.getElementById('step-voice').classList.replace('inactive', 'active');
-                    document.getElementById('step-absen').classList.replace('inactive', 'active');
-                    document.getElementById('resultCard').style.display = 'block';
-                    voiceVerified = true;
-                } else {
-                    voiceResultDiv.innerHTML = `<div class="alert alert-danger">Verifikasi suara gagal.</div>`;
+                        document.getElementById('step-voice').classList.replace('inactive', 'active');
+                        document.getElementById('step-absen').classList.replace('inactive', 'active');
+                        document.getElementById('resultCard').style.display = 'block';
+                        voiceVerified = true;
+                    } else {
+                        voiceResultDiv.innerHTML = `<div class="alert alert-danger">Verifikasi suara gagal.</div>`;
+                        voiceVerified = false;
+                    }
+                })
+                .catch(err => {
+                    console.error("Voice Error:", err);
+                    document.getElementById("voiceResult").innerHTML =
+                        `<div class="alert alert-danger">Terjadi kesalahan saat verifikasi suara.</div>`;
                     voiceVerified = false;
-                }
-            })
-            .catch(err => {
-                console.error("Voice Error:", err);
-                document.getElementById("voiceResult").innerHTML = `<div class="alert alert-danger">Terjadi kesalahan saat verifikasi suara.</div>`;
-                voiceVerified = false;
-            });
+                });
         }
 
         function submitAbsen() {
@@ -193,23 +219,23 @@
             }
 
             fetch('{{ url('/submit-absen') }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Presensi berhasil!");
-                    window.location.href = "{{ url('/home') }}";
-                } else {
-                    alert("Gagal mencatat presensi.");
-                }
-            })
-            .catch(err => console.error("Submit Error:", err));
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Presensi berhasil!");
+                        window.location.href = "{{ url('/home') }}";
+                    } else {
+                        alert("Gagal mencatat presensi.");
+                    }
+                })
+                .catch(err => console.error("Submit Error:", err));
         }
     </script>
 
