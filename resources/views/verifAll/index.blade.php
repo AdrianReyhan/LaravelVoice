@@ -154,7 +154,7 @@
                         const audioBlob = new Blob(audioChunks, {
                             type: 'audio/wav'
                         });
-                        sendToBackend(audioBlob);
+                        sendToBackend(audioBlob); // Send audio blob to backend
                         audioChunks = [];
                     };
                     mediaRecorder.start();
@@ -175,26 +175,28 @@
             recordBtn.disabled = false;
         });
 
+        // Send the audio blob to the backend for verification
         function sendToBackend(blob) {
             const formData = new FormData();
-            formData.append('voice', blob, 'recorded_audio.wav');
-
-            fetch('{{ route('verify.voice') }}', {
+            formData.append('audio', blob, 'recorded_audio.wav');
+            console.log([...formData.entries()]);
+            fetch('{{ route('verifikasi.voice') }}', { // Use the route you've defined in your routes file
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}" // CSRF token for protection
                     },
                     body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     const voiceResultDiv = document.getElementById("voiceResult");
                     if (data.score && data.prediction) {
                         voiceResultDiv.innerHTML = `
-                        <div class="alert alert-success">
-                            <p><strong>Score:</strong> ${data.score}</p>
-                            <p><strong>Prediction:</strong> ${data.prediction}</p>
-                        </div>`;
+                    <div class="alert alert-success">
+                        <p><strong>Score:</strong> ${data.score}</p>
+                        <p><strong>Prediction:</strong> ${data.prediction}</p>
+                    </div>`;
                         document.getElementById('step-voice').classList.replace('inactive', 'active');
                         document.getElementById('step-absen').classList.replace('inactive', 'active');
                         document.getElementById('resultCard').style.display = 'block';
@@ -211,6 +213,7 @@
                     voiceVerified = false;
                 });
         }
+
 
         function submitAbsen() {
             if (!faceVerified || !voiceVerified) {

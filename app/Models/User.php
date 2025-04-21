@@ -50,4 +50,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(FaceEnrollment::class);
     }
+
+
+    public function voiceEnrollment()
+    {
+        return $this->hasOne(VoiceEnrollment::class);
+    }
 }

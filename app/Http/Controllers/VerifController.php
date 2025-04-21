@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use App\Models\User;
 use App\Models\FaceEnrollment;
 use App\Models\Voice;
+use Illuminate\Support\Facades\Log;
 
 class VerifController extends Controller
 {
@@ -91,6 +92,7 @@ class VerifController extends Controller
     public function verifyVoice(Request $request)
     {
         if (!$request->hasFile('audio')) {
+            Log::error('No audio file received');
             return response()->json([
                 'status' => 'error',
                 'message' => 'No audio file provided'
@@ -98,7 +100,8 @@ class VerifController extends Controller
         }
 
         $audioFile = $request->file('audio');
-
+        Log::info('Audio file received: ' . $audioFile->getClientOriginalName());
+        Log::info('File size: ' . $audioFile->getSize());
         $fileName = 'uploads/audio_' . uniqid() . '.wav';
         Storage::disk('public')->put($fileName, file_get_contents($audioFile));
 
@@ -141,11 +144,11 @@ class VerifController extends Controller
                     'message' => 'Suara dikenali tetapi tidak sesuai dengan user yang login'
                 ]);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Voice recognition failed or no voice detected.'
-            ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Voice recognition failed or no voice detected.'
+                ]);
         }
     }
 }

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Voice;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use App\Models\VoiceEnrollment;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class VoiceEnrollmentController extends Controller
 {
@@ -19,34 +18,28 @@ class VoiceEnrollmentController extends Controller
     public function registerVoice(Request $request)
     {
         try {
+            // Validate the incoming request to ensure an audio file is provided
             $request->validate([
-                'voice' => 'required|mimes:wav,mp3,webm|max:10240', // max 10MB
+                'voice' => 'required|mimes:wav,mp3,webm|max:10240', // 10 MB limit
             ]);
 
+            // Get user ID and the uploaded file
             $userId = Auth::id();
             $file = $request->file('voice');
-            $extension = $file->getClientOriginalExtension();
 
-            // Buat nama file dan simpan ke storage/public/voices
-            $fileName = 'voices/voice_' . uniqid() . '.' . $extension;
-            $stored = Storage::disk('public')->put($fileName, file_get_contents($file));
-
-            if (!$stored) {
-                Log::error("Gagal menyimpan file suara ke storage.");
-                return redirect()->route('voiceEnroll.index')->with('error', 'Gagal menyimpan suara.');
-            }
-
-            Log::info("Voice successfully saved: " . $fileName);
+            // Save the file temporarily in storage
+            $fileName = 'voice_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $filePath = storage_path('app/public/' . $fileName);
+            $file->move(storage_path('app/public/'), $fileName);
 
-            // Kirim file ke Flask API
+            // Send the audio file to Flask API for processing
             $client = new Client();
             $response = $client->post('http://127.0.0.1:5000/enrol_voice', [
                 'multipart' => [
                     [
-                        'name'     => 'voice',
+                        'name'     => 'audio_file',
                         'contents' => fopen($filePath, 'r'),
-                        'filename' => basename($filePath),
+                        'filename' => $fileName,
                     ],
                     [
                         'name'     => 'user_id',
@@ -58,32 +51,29 @@ class VoiceEnrollmentController extends Controller
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['status']) && $data['status'] === 'success') {
-                $existing = Voice::where('user_id', $userId)->first();
+                // Get the embedding from the Flask response
+                $embedding = $data['embedding'];
 
-                if ($existing) {
-                    // Hapus file lama dari storage
-                    if (Storage::disk('public')->exists($existing->voice_path)) {
-                        Storage::disk('public')->delete($existing->voice_path);
-                    }
-
-                    // Update voice_path baru
-                    $existing->update(['voice_path' => $fileName]);
+                // Check if the user already has an existing voice record
+                $existingVoice = VoiceEnrollment::where('user_id', $userId)->first();
+                if ($existingVoice) {
+                    // Update the existing voice embedding
+                    $existingVoice->update(['embedding' => $embedding]);
                 } else {
-                    // Insert baru
-                    Voice::create([
+                    // Create a new record for the user's voice embedding
+                    VoiceEnrollment::create([
                         'user_id' => $userId,
-                        'voice_path' => $fileName,
+                        'embedding' => $embedding,
                     ]);
                 }
 
-                return redirect()->route('voiceEnroll.index')->with('success', 'Suara berhasil didaftarkan!');
+                return redirect()->route('voiceEnroll.index')->with('success', 'Voice enrolled successfully!');
             }
 
-            return redirect()->route('voiceEnroll.index')->with('error', 'Pendaftaran suara gagal dari API.');
+            return redirect()->route('voiceEnroll.index')->with('error', 'Voice enrollment failed.');
         } catch (\Exception $e) {
             Log::error("Voice enrollment error: " . $e->getMessage());
-
-            return redirect()->route('voiceEnroll.index')->with('error', 'Terjadi kesalahan saat mendaftar suara.');
+            return redirect()->route('voiceEnroll.index')->with('error', 'An error occurred while registering the voice.');
         }
     }
 }
