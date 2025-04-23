@@ -27,10 +27,12 @@ class VoiceEnrollmentController extends Controller
             $userId = Auth::id();
             $file = $request->file('voice');
 
-            // Save the file temporarily in storage
+            $directory = storage_path('app/public/voices');
+
             $fileName = 'voice_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $filePath = storage_path('app/public/' . $fileName);
-            $file->move(storage_path('app/public/'), $fileName);
+            $filePath = $directory . '/' . $fileName; 
+
+            $file->move($directory, $fileName);
 
             // Send the audio file to Flask API for processing
             $client = new Client();
