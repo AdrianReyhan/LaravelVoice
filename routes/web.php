@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/voice-enrol', [VoiceEnrollmentController::class, 'index'])->name('voiceEnroll.index');
     Route::post('/voice-enrol', [VoiceEnrollmentController::class, 'registerVoice'])->name('registerVoice');
     Route::get('/verifsuara', [VerifVoiceController::class , 'index'])->name('verif.index');
-    Route::post('/verify-voice', [VoiceEnrollmentController::class, 'registerVoice'])->name('verifyVoice');
+    // Route::post('/verify-voice', [VoiceEnrollmentController::class, 'registerVoice'])->name('verifyVoice');
 
 
     Route::get('/verifikasi', [VerifController::class, 'index'])->name('verifikasi.index');

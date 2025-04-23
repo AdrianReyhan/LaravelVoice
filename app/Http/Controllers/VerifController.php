@@ -85,29 +85,23 @@ class VerifController extends Controller
         }
     }
 
-
-    /**
-     * Verifikasi suara dari input file audio
-     */
     public function verifyVoice(Request $request)
     {
-        if (!$request->hasFile('audio')) {
-            Log::error('No audio file received');
+        // Ambil data audio
+        $audio = $request->file('audio');
+
+        if (!$audio) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No audio file provided'
+                'message' => 'No audio provided'
             ]);
         }
 
-        $audioFile = $request->file('audio');
-        Log::info('Audio file received: ' . $audioFile->getClientOriginalName());
-        Log::info('File size: ' . $audioFile->getSize());
-        $fileName = 'uploads/audio_' . uniqid() . '.wav';
-        Storage::disk('public')->put($fileName, file_get_contents($audioFile));
+        // Ambil user_id dari autentikasi pengguna yang sedang login
+        $userId = Auth::user()->id;
 
-        $user_id = Auth::user()->id;
-
-        $voiceEnrollment = Voice::where('user_id', $user_id)->first();
+        // Pastikan voice enrollment untuk user sudah ada (bisa ditambahkan jika perlu)
+        $voiceEnrollment = Voice::where('user_id', $userId)->first();
 
         if (!$voiceEnrollment) {
             return response()->json([
@@ -117,38 +111,45 @@ class VerifController extends Controller
         }
 
         try {
+            // Kirim audio dan user_id ke API Flask untuk verifikasi
             $client = new Client();
             $response = $client->post('http://127.0.0.1:5000/recognize_voice', [
                 'multipart' => [
                     [
-                        'name' => 'audio',
-                        'contents' => fopen(storage_path('app/public/' . $fileName), 'r'),
-                        'filename' => basename($fileName),
+                        'name'     => 'audio_file',
+                        'contents' => fopen($audio->getPathname(), 'r'),
+                        'filename' => $audio->getClientOriginalName(),
                     ],
+                    [
+                        'name'     => 'user_id',  // Menambahkan user_id ke dalam form data
+                        'contents' => $userId,
+                    ]
                 ]
             ]);
 
             $data = json_decode($response->getBody(), true);
 
-            if (isset($data['identity']) && $data['identity'] == $user_id) {
-                $user = User::find($user_id);
+            // Jika identitas yang dikembalikan sesuai dengan user yang login
+            if (isset($data['identity']) && $data['identity'] == $userId) {
+                $user = User::find($userId);
 
                 return response()->json([
                     'status' => 'success',
-                    'identity' => $user ? $user->name : 'Unknown',
-                    'message' => 'Voice recognized successfully!'
+                    'prediction' => $user ? $user->name : 'Unknown',
+                    'score' => $data['similarity'], // Misalnya ini adalah skor kesamaan suara
+                    'message' => 'Suara berhasil dikenali!'
                 ]);
             } else {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Suara dikenali tetapi tidak sesuai dengan user yang login'
+                    'message' => 'Suara tidak dikenali atau tidak sesuai dengan user yang login'
                 ]);
             }
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Voice recognition failed or no voice detected.'
-                ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memverifikasi suara: ' . $e->getMessage()
+            ]);
         }
     }
 }

@@ -110,7 +110,7 @@
                         faceResultDiv.innerHTML = `
                 <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
                     <strong>Berhasil!</strong> Wajah dikenali sebagai <strong>${data.identity}</strong> <br>
-                    <strong>Similarity:</strong> <strong>${data.similarity}%</strong>.
+                    <strong>Kemiripan Wajah:</strong> <strong>${data.similarity}%</strong>.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
                         document.getElementById('step-face').classList.replace('inactive', 'active');
@@ -178,12 +178,13 @@
         // Send the audio blob to the backend for verification
         function sendToBackend(blob) {
             const formData = new FormData();
-            formData.append('audio', blob, 'recorded_audio.wav');
-            console.log([...formData.entries()]);
-            fetch('{{ route('verifikasi.voice') }}', { // Use the route you've defined in your routes file
+            formData.append('audio', blob, 'recorded_audio.wav'); // Nama file bisa disesuaikan
+            formData.append('user_id', '{{ auth()->user()->id }}');
+
+            fetch('{{ route('verifikasi.voice') }}', { // Pastikan URL ini sesuai dengan route di Flask
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}" // CSRF token for protection
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}" // CSRF token untuk proteksi
                     },
                     body: formData
                 })
@@ -191,26 +192,28 @@
                 .then(data => {
                     console.log(data);
                     const voiceResultDiv = document.getElementById("voiceResult");
-                    if (data.score && data.prediction) {
+                    if (data.status === "success") {
                         voiceResultDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <p><strong>Score:</strong> ${data.score}</p>
-                        <p><strong>Prediction:</strong> ${data.prediction}</p>
-                    </div>`;
+                 <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                     <strong>Berhasil!</strong> Suara dikenali sebagai <strong> ${data.prediction}</strong> <br>
+                    <strong>Kemiripan Suara:</strong> <strong> ${data.score}%</strong>
+                </div>
+            `;
                         document.getElementById('step-voice').classList.replace('inactive', 'active');
                         document.getElementById('step-absen').classList.replace('inactive', 'active');
-                        document.getElementById('resultCard').style.display = 'block';
-                        voiceVerified = true;
                     } else {
-                        voiceResultDiv.innerHTML = `<div class="alert alert-danger">Verifikasi suara gagal.</div>`;
-                        voiceVerified = false;
+                        voiceResultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                   Suara tidak dikenali atau tidak sesuai dengan user yang login.
+                </div>
+            `;
                     }
                 })
                 .catch(err => {
                     console.error("Voice Error:", err);
-                    document.getElementById("voiceResult").innerHTML =
-                        `<div class="alert alert-danger">Terjadi kesalahan saat verifikasi suara.</div>`;
-                    voiceVerified = false;
+                    document.getElementById("voiceResult").innerHTML = `
+            <div class="alert alert-danger">Terjadi kesalahan saat verifikasi suara.</div>
+        `;
                 });
         }
 
