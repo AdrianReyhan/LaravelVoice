@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use App\Models\User;
 use App\Models\FaceEnrollment;
 use App\Models\Voice;
+use App\Models\VoiceEnrollment;
 use Illuminate\Support\Facades\Log;
 
 class VerifController extends Controller
@@ -101,7 +102,7 @@ class VerifController extends Controller
         $userId = Auth::user()->id;
 
         // Pastikan voice enrollment untuk user sudah ada (bisa ditambahkan jika perlu)
-        $voiceEnrollment = Voice::where('user_id', $userId)->first();
+        $voiceEnrollment = VoiceEnrollment::where('user_id', $userId)->first();
 
         if (!$voiceEnrollment) {
             return response()->json([
