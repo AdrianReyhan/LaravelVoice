@@ -62,14 +62,20 @@ class VerifController extends Controller
 
             $data = json_decode($response->getBody(), true);
 
-            // Assuming Flask API returns the similarity score as 'similarity'
+            if ($response->getStatusCode() === 400 && isset($data['message'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $data['message']
+                ]);
+            }
+
             if (isset($data['identity']) && $data['identity'] == $user_id) {
                 $user = User::find($user_id);
 
                 return response()->json([
                     'status' => 'success',
                     'identity' => $user ? $user->name : 'Unknown',
-                    'similarity' => isset($data['similarity']) ? $data['similarity'] : 0, // Add similarity score here
+                    'similarity' => $data['similarity'] ?? 0,
                     'message' => 'Wajah berhasil dikenali!'
                 ]);
             } else {
@@ -78,6 +84,14 @@ class VerifController extends Controller
                     'message' => 'Wajah dikenali tetapi tidak sesuai dengan user yang login'
                 ]);
             }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+            $data = json_decode($response->getBody(), true);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $data['message'] ?? 'Kesalahan dari API saat mendeteksi spoofing.'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
