@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FaceController;
 use App\Http\Controllers\FaceEnrollmentController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\VerifController;
 use App\Http\Controllers\VerifFaceController;
 use App\Http\Controllers\VerificationController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\VoiceController;
 use App\Http\Controllers\VoiceEnrollmentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use phpDocumentor\Reflection\Types\Resource_;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -51,6 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/verify', [VerificationController::class, 'verify'])->name('verify');
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    //status
+    Route::resource('statuses' , StatusController::class);
 });
 
 

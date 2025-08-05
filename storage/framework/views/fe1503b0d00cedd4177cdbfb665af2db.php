@@ -15,6 +15,7 @@
 
     <!-- Custom styles for this template-->
     <link href="<?php echo e(asset('css/sb-admin-2.min.css')); ?>" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
     <!-- Custom styles for this Page-->
     <?php echo $__env->yieldContent('custom_styles'); ?>
@@ -80,6 +81,28 @@
                     </ul>
 
                 </nav>
+                <!-- Flash Success Message -->
+                <?php if(session('success')): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Berhasil!</strong> <?php echo e(session('success')); ?>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Flash Error Message -->
+                <?php if(session('error')): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> <?php echo e(session('error')); ?>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+
                 <!-- End of Topbar -->
                 <?php echo $__env->yieldContent('content'); ?>
             </div>
@@ -142,10 +165,55 @@
 
     <!-- Custom scripts for all pages-->
     <script src="<?php echo e(asset('js/sb-admin-2.min.js')); ?>"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Skrip untuk menginisialisasi DataTables -->
+    <script>
+        $(document).ready(function() {
+            // Mengaktifkan DataTables dengan semua fitur default, termasuk paginasi, pencarian, dan pengurutan.
+            $('#dataTable').DataTable();
+        });
+    </script>
+
 
     <!-- Page level custom scripts -->
     <?php echo $__env->yieldContent('custom_scripts'); ?>
+    <script>
+        // Konfirmasi sebelum hapus
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: "Data yang dihapus tidak bisa dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 
+    <?php if(session('success')): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '<?php echo e(session('success')); ?>',
+                timer: 3000,
+                showConfirmButton: true
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

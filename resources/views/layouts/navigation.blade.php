@@ -25,10 +25,15 @@
             <i class="fas fa-fw fa-users"></i>
             <span>{{ __('Users') }}</span></a>
     </li>
+    <li class="nav-item @if (request()->routeIs('statuses.index')) active @endif">
+        <a class="nav-link" href="{{ route('statuses.index') }}">
+            <i class="fas fa-fw fa-users"></i>
+            <span>{{ __('Status') }}</span></a>
+    </li>
 
     <li class="nav-item @if (request()->routeIs('voiceEnroll.index')) active @endif">
         <a class="nav-link" href="{{ route('voiceEnroll.index') }}">
-            <i class="fas fa-volume-up"></i> 
+            <i class="fas fa-volume-up"></i>
             <span>{{ __('Voice Enroll') }}</span></a>
     </li>
     {{-- <li class="nav-item @if (request()->routeIs('verification.index')) active @endif">
@@ -47,7 +52,7 @@
             <i class="fas fa-fw fa-eye"></i>
             <span>{{ __('verif') }}</span></a>
     </li> --}}
-     <li class="nav-item @if (request()->routeIs('verifikasi.index')) active @endif">
+    <li class="nav-item @if (request()->routeIs('verifikasi.index')) active @endif">
         <a class="nav-link" href="{{ route('verifikasi.index') }}">
             <i class="fas fa-fw fa-eye"></i>
             <span>{{ __('verif') }}</span></a>
